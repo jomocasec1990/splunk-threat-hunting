@@ -106,7 +106,7 @@ sudo /opt/splunk/bin/splunk enable boot-start
 | Validate Installation         | `/opt/splunk/bin/splunk validate files`                                 |
 | Access Web Interface          | `http://<host>:8000`                                                    |
 
-```
+---
 
 ![Splunk-login](Screenshots/splunk-01-install.png)
 
