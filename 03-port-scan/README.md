@@ -90,5 +90,8 @@ index=linux_audit sourcetype="linux:auditd" type=SOCKADDR
 
 ## 📸 Screenshot
 
+The dashboard panel shows one line where source IP `10.1.2.100` scanned 42 unique ports on a single host between `19:17:52` and `19:42:17` on June 22, 2025.
+
+
 > ![Splunk Search Result](./Screenshots/splunk-scanning-01.png)
 
