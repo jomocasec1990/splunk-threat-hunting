@@ -90,5 +90,5 @@ index=linux_audit sourcetype="linux:auditd" type=SOCKADDR
 
 ## 📸 Screenshot
 
-> ![Splunk Search Result](./screenshots/splunk_search.png)
+> ![Splunk Search Result](./Screenshots/splunk-scanning-01.png)
 
