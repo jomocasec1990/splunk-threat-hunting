@@ -23,15 +23,29 @@ The labs simulate real-world attack scenarios and use Splunk to detect and analy
 
 ## ⚒️ Lab Environment
 
-| Component      | Tool                          |
-|----------------|-------------------------------|
-| SIEM           | Splunk Enterprise (Developer License) |
-| Data Sources   | Sysmon, Windows logs, Zeek, CTI feeds |
-| Threat Feeds   | MISP, AlienVault OTX, VirusTotal |
-| Machine Learning | Splunk MLTK                 |
-| Network Traffic | RITA + Zeek + MongoDB        |
+| Component         | Tool / Platform                                 |
+|------------------|--------------------------------------------------|
+| **SIEM**         | Splunk Enterprise (Developer License)            |
+| **Endpoints**    | Windows 10 (Sysmon, Atomic Red Team)             |
+| **Servers**      | Ubuntu (Web, Honeypot), Windows Server (AD)      |
+| **Firewall**     | Palo Alto NGFW (syslog to Splunk)                |
+| **Threat Feeds** | MISP, AlienVault OTX, VirusTotal API             |
+| **ML/Analytics** | Splunk MLTK, RITA + Zeek + MongoDB               |
+| **Enrichment**   | ChatGPT, DNS tools, CTI modules                  |
 
 ---
+
+## 🔐 Network Topology – Zones & IP Schema
+
+| Zone             | Subnet            | VM(s)                                             | Notes                              |
+|------------------|-------------------|---------------------------------------------------|-------------------------------------|
+| Inside Network   | 10.1.1.0/24       | Windows10: 10.1.1.10                              | User/attacker endpoint              |
+| DMZ Network      | 10.1.2.0/24       | AD-Konoha: 10.1.2.10, WebServer: 10.1.2.11, Honeypot: 10.1.2.12, Kali: 10.1.2.100 | Public-facing, exposed services     |
+| Management Net   | 10.1.3.0/24       | Splunk Server: 10.1.3.12, Wazuh: 10.1.3.11, Docker-Server: 10.1.3.10 | Security tools & backend            |
+| Outside Network  | 192.168.0.0/24    | Kali (ext): 192.168.0.100                         | Internet simulation (optional)      |
+
+---
+
 
 ## 🧐 About Me
 
