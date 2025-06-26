@@ -1,6 +1,6 @@
 # 🛡️ SOC Threat Hunting with Splunk – Labs & Detection Techniques
 
-This repository documents my hands-on threat hunting labs using **Splunk Enterprise** based on the course **"SOC Cybersecurity Threat Hunting with Splunk"** by Mohammad Mirasadollahi.
+This repository documents my hands-on threat hunting labs using **Splunk Enterprise** 
 
 The labs simulate real-world attack scenarios and use Splunk to detect and analyze adversary techniques aligned with **MITRE ATT&CK**.
 
