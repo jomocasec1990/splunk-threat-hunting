@@ -54,7 +54,9 @@ msiexec /i splunkforwarder-9.4.3-*-x64-release.msi ^
            state=enabled Active=true
    ```
 
-3. **Screenshot:** `screenshots/win_service_running.png`
+3. **Screenshot:**
+
+![WindowsForward-Capture](Screenshots/splunk-forward-02.png)
 
 ---
 
@@ -85,7 +87,7 @@ Active forwards:
         state=enabled Active=true
 ```
 
-Screenshot: `screenshots/linux_forwarder_status.png`
+![LinuxForward-Capture](Screenshots/splunk-forward-03.png)
 
 ---
 
@@ -100,14 +102,24 @@ Screenshot: `screenshots/linux_forwarder_status.png`
    | stats count by host, group, series
    ```
 
-   You should see non‑zero event counts for the new host.
+   📌 **What does this query verify?**
 
-   Screenshot: `screenshots/splunk_search_internal.png`
+   This SPL searches the `_internal` index where Splunk stores internal performance logs.
+   It shows whether the Universal Forwarder is communicating with the indexer and sending monitoring metrics.
 
-2. **Forwarder Management**
+   - **`host`**: the name of the forwarder machine (e.g., `Uzumaki`)
+   - **`group`**: type of metric (e.g., `per_host_agg_cpu`, `per_index_thruput`)
+   - **`series`**: specific monitored input or component (e.g., `_internal`, `audittrail`, log file paths)
 
-   - *Settings ➜ Forwarder Management ➜ Forwarders*  
-     Ensure the host appears with status **“Connected”**.
+   ✅ If you see multiple rows with non-zero event counts, your forwarder is active and properly sending telemetry.
+
+   📸 Screenshot:
+
+![Splunk-Capture](Screenshots/splunk-forward-04.png)
+
+
+   > *Tip: This query is also useful for building dashboards to monitor forwarder health.*
+
 
 ---
 
@@ -136,4 +148,4 @@ git commit -m "Add Splunk UF installation docs and verification screenshots"
 git push origin main
 ```
 
-Happy hunting! 🎯
+Lets Hunt! 🎯
