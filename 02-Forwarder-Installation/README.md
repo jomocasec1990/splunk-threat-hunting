@@ -138,14 +138,8 @@ Active forwards:
 
 - **Both forwarders list connection `Active=true`.**  
 - **Events from each host visible in Splunk GUI.**  
-- **All three screenshots committed to `screenshots/` folder.**
 
-Commit example:
 
-```bash
-git add labs/01-forwarder-installation/README.md labs/01-forwarder-installation/screenshots/*.png
-git commit -m "Add Splunk UF installation docs and verification screenshots"
-git push origin main
 ```
 
 Lets Hunt! 🎯
