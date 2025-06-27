@@ -93,11 +93,10 @@ index=wineventlog_security (EventCode=4625 OR EventCode=4624)
 
 You should see something like:
 
-```
 
 ![Splunk SPL](./Screenshots/splunk-bruteforce-02.png)
 
-```
+
 
 ---
 
