@@ -1,5 +1,5 @@
 
-# Brute Force Detection Lab on Windows (Splunk SIEM)
+# Brute Force Detection Lab on Windows 
 
 ## 🧠 **Overview**
 
@@ -91,12 +91,20 @@ index=wineventlog_security (EventCode=4625 OR EventCode=4624)
 | where failures > 5
 ```
 
+### 🔎 SPL Breakdown
+
+- `index=wineventlog_security (EventCode=4625 OR EventCode=4624)`: Filter login success (4624) and failure (4625) logs.
+- `eval action=...`: Label each event as either `"success"` or `"failure"`.
+- `bucket _time span=1h`: Group events in 1-hour buckets for time-based aggregation.
+- `stats ... by src_ip, _time`: Count failed/successful logins by source IP and hour.
+- `where failures > 5`: Detects brute force patterns where more than 5 login failures occur.
+
 You should see something like:
 
 
 ![Splunk SPL](./Screenshots/splunk-bruteforce-02.png)
 
-
+This output shows that the IP 10.1.2.100 generated 25 failed login attempts within a 1-hour period and no successful logins, matching a typical brute force pattern.
 
 ---
 
@@ -126,10 +134,8 @@ You should see something like:
 1. Re-run the `hydra` brute force from Kali.
 2. Wait until the alert is scheduled to run (or execute manually).
 3. Go to **Activity > Triggered Alerts** and confirm it appears.
-4. Check the **email inbox** at `socseclabjmc@gmail.com`.
+4. Check the **email inbox** 
 
-
-![Splunk SPL](./Screenshots/splunk-bruteforce-05.png)
 
 ---
 
