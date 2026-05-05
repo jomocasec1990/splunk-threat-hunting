@@ -1,144 +1,182 @@
-
-# Brute Force Detection Lab on Windows 
-
-## 🧠 **Overview**
-
-This hands-on lab demonstrates how to simulate and detect a brute force attack on a Windows environment using Splunk SIEM. The objective is to:
-
-Recreate a common brute force attack scenario via RDP using a Kali Linux attacker.
-
-Prepare the Windows environment (Domain Controller and endpoint) to properly audit and log login attempts.
-
-Use Splunk to collect Windows Security Events and create a detection rule that identifies multiple failed logon attempts from the same source.
-
-Set up a Splunk alert to notify when suspicious behavior occurs.
-
-This lab provides security analysts and defenders with a step-by-step guide to reproduce a real-world attack pattern and improve detection capabilities for credential-based attacks.
-
-## 🛠️ Step 1: Enable Logon Auditing via GPO
-
-On **Konoha (Domain Controller)**:
-
-1. Press `Win + R`, type `gpmc.msc`, and press Enter.
-2. Navigate to:
-
-   ```
-   Forest > Domains > seclabjmc.com
-   ```
-3. Right-click `seclabjmc.com` → **Create a GPO in this domain, and Link it here...**
-
-   * **Name**: `GPO - Audit Logon Events`
-4. Right-click the new GPO → **Edit**
-5. Navigate to:
-
-   ```
-   Computer Configuration >
-   Policies >
-   Windows Settings >
-   Security Settings >
-   Advanced Audit Policy Configuration >
-   Audit Policies >
-   Logon/Logoff
-   ```
-6. Enable the following subcategories:
-
-| Subcategory         | Setting          |
-| ------------------- | ---------------- |
-| Audit Logon         | Success, Failure |
-| Audit Logoff        | Success, Failure |
-| Audit Special Logon | Success          |
+# 🚨 Incident Report – SSH Brute Force Attack
 
 ---
 
-## 🔄 Step 2: Apply GPO in the Target (Senju)
+## 📌 Executive Summary
 
-Open PowerShell or CMD as Administrator on **Senju**:
+**Incident ID:** IR-SSH-001  
+**Severity:** High (P2)  
+**Status:** Confirmed Compromise  
 
-```bash
-gpupdate /force
-auditpol /get /category:"Logon/Logoff"
-```
+### 🧾 Overview
 
-You should see:
+On May 5th, 2026, multiple failed SSH authentication attempts were detected on server **Uchiha**. The activity originated from IP **185.220.101.1**, later identified as a **TOR exit node** with a high abuse score.
 
-```
-Logon                                   Success and Failure
-Logoff                                  Success and Failure
-Special Logon                           No Auditing
-```
+After multiple failed attempts, a **successful login to the `admin` account** was observed, confirming unauthorized access.
 
 ---
 
-## 🎯 Step 3: Simulate Brute Force from Kali Linux
+## 🔍 Key Findings
 
-On **Kali Linux**:
-
-```bash
-hydra -l jomoca -P passwords.txt -t 4 -f -o result.txt rdp://10.1.1.2
-```
+- 136 failed SSH login attempts detected  
+- Attack originated from TOR node (anonymous attacker)  
+- Targeted valid usernames (`admin`, `root`, `mysql`)  
+- Successful authentication achieved  
+- Confirmed brute force compromise  
 
 ---
 
-## 🔍 Step 4: Detection in Splunk
+## 🧪 Technical Analysis
 
-Run the following SPL in Splunk Search:
+### 📡 Detection Query
 
 ```spl
-index=wineventlog_security (EventCode=4625 OR EventCode=4624)
-| eval action=if(EventCode=4625, "failure", "success")
-| bucket _time span=1h
-| stats count(eval(action="success")) as successes count(eval(action="failure")) as failures by src_ip, _time
-| where failures > 5
+index=linux_auth host=Uchiha sourcetype=linux_secure app=ssh action=failure
+| stats count by src
+| sort - count
 ```
 
-### 🔎 SPL Breakdown
+### 📸 Evidence
 
-- `index=wineventlog_security (EventCode=4625 OR EventCode=4624)`: Filter login success (4624) and failure (4625) logs.
-- `eval action=...`: Label each event as either `"success"` or `"failure"`.
-- `bucket _time span=1h`: Group events in 1-hour buckets for time-based aggregation.
-- `stats ... by src_ip, _time`: Count failed/successful logins by source IP and hour.
-- `where failures > 5`: Detects brute force patterns where more than 5 login failures occur.
+![Brute Force Attempts](./Screenshots/investigation01.png)
 
-You should see something like:
+### 🧾 Result
 
-
-![Splunk SPL](./Screenshots/splunk-bruteforce-02.png)
-
-This output shows that the IP 10.1.2.100 generated 25 failed login attempts within a 1-hour period and no successful logins, matching a typical brute force pattern.
+- **Source IP:** 185.220.101.1  
+- **Failed attempts:** 136  
 
 ---
 
-## 📣 Step 5: Create Alert in Splunk
+### 👤 Username Enumeration
 
-1. In the Search App, run the SPL query above.
-2. Click **Save As > Alert**.
-3. Configure:
+```spl
+index=linux_auth host=Uchiha sourcetype=linux_secure app=ssh action=failure src=185.220.101.1
+| eval username=if(match(_raw,"invalid user"),"invalid_user",user)
+| stats count by username
+| sort - count
+```
 
-   * **Title**: `Brute Force Alert - Multiple Failed Logins`
-   * **Description**: Detects more than 5 failed login attempts from the same IP within 1 hour.
-   * **Permissions**: (App or Global)
-   * **Trigger**:
+### 📸 Evidence
 
-     * **When**: `Number of results > 0`
-     * **Trigger**: `Once per result`
-   * **Time Range**: `Run every 60 minutes`
-   * **Actions**:
+![Username Enumeration](./Screenshots/investigation03.png)
 
-     * ✅ Send email
-     * ✅ Add to Triggered Alerts
+### 🧾 Result
 
----
+Targeted users:
 
-## ✅ Step 6: Validate the Alert
-
-1. Re-run the `hydra` brute force from Kali.
-2. Wait until the alert is scheduled to run (or execute manually).
-3. Go to **Activity > Triggered Alerts** and confirm it appears.
-4. Check the **email inbox** 
-
+- admin  
+- root  
+- mysql  
+- invalid users  
 
 ---
 
-© 2025 Jordan Moran Cabello — Splunk SIEM Lab
+### ⏱ Timeline Analysis
 
-> This lab is part of a Threat Detection series for GitHub portfolio
+```spl
+index=linux_auth host=Uchiha sourcetype=linux_secure src=185.220.101.1
+| eval "Date and Time" = strftime(_time,"%Y-%m-%d %H:%M:%S")
+| table "Date and Time" action user src
+| sort "Date and Time"
+```
+
+### 📸 Evidence
+
+![Timeline](./Screenshots/investigation04.png)
+
+### 🧾 Findings
+
+- High-frequency attempts within seconds  
+- Automated attack behavior (likely brute force tool)  
+
+---
+
+### 🔐 Successful Login Detection
+
+```spl
+index=linux_auth host=Uchiha sourcetype=linux_secure "Accepted password" src=185.220.101.1
+| table _time action user src
+```
+
+### 📸 Evidence
+
+![Successful Login](./Screnshots/investigation05.png)
+
+### 🧾 Result
+
+- Successful login detected  
+- **Compromised account:** `admin`  
+
+---
+
+## 🌍 Indicators of Compromise (IoCs)
+
+- **IP Address:** 185.220.101.1  
+- **Type:** TOR Exit Node  
+- **Abuse Score:** 100%  
+- **Behavior:** SSH brute force + successful authentication  
+
+### 📸 Threat Intelligence Evidence
+
+![AbuseIPDB](./Screenshots/investigation02.png)
+
+---
+
+## 🧠 Root Cause Analysis
+
+- There was a weak or guessable password for `admin`  
+- SSH was exposed to external network
+- There wasn o brute force protection such fail2ban, rate limiting, etc.  
+- No MFA or key-based authentication enforced on the server
+
+---
+
+## ⏱ Technical Timeline
+
+| Time       | Event                              |
+|-----------|------------------------------------|
+| 07:37:xx  | Multiple failed SSH attempts       |
+| 07:37:47  | Successful login detected          |
+| Post-login| Unauthorized access confirmed      |
+
+---
+
+## ⚠️ Impact Analysis
+
+- There has been a compromise of valid credentials  
+- There has unauthorized SSH access  
+
+### Potential Impact:
+
+- Privilege escalation  
+- Persistence  
+- Lateral movement  
+
+---
+
+## 🛡️ Response Actions
+
+- Identified compromised account (`admin`)  
+- Validated source IP reputation  
+- Confirmed successful login event  
+- Analyzed authentication logs  
+
+---
+
+## 🔄 Recommendations
+
+- Reset compromised credentials immediately  
+- Disable SSH password authentication  
+- Enable SSH key-based authentication  
+- Implement brute force protection (fail2ban)  
+- Restrict SSH access via firewall  
+- Monitor for post-compromise activity  
+
+---
+
+## 📚 Lessons Learned
+
+- Brute force attacks can escalate quickly to compromise  
+- Exposure of SSH without controls is high risk  
+- Threat intelligence enrichment adds critical context  
+- Detection must include both failure AND success correlation  
