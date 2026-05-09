@@ -100,7 +100,7 @@ index=linux_auth host=Uchiha sourcetype=linux_secure "Accepted password" src=185
 
 ### 📸 Evidence
 
-![Successful Login](./Screnshots/Investigation05.png)
+![Successful Login](./Screenshots/Investigation05.png)
 
 ### 🧾 Result
 
