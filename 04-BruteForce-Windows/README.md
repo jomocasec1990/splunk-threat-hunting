@@ -1,34 +1,33 @@
-# 🚨 Incident Report – SSH Brute Force Attack
+🔎 SSH Brute Force Attack Investigation
+---
+
+## 📌 Objective
+
+The objective of this investigation is to analyze suspicious SSH authentication activity detected on the server **Uchiha** following a triggered security alert.  
+
+The analysis aims to identify the source of the attack, determine whether the activity resulted in unauthorized access, and assess the potential impact on the system.
 
 ---
 
-## 📌 Executive Summary
+## 🧠 Intial Hypohesis
 
-**Incident ID:** IR-SSH-001  
-**Severity:** High (P2)  
-**Status:** Confirmed Compromise  
+While reviewing authentication logs, I observed a high number of failed SSH login attempts.  
 
-### 🧾 Overview
+This raised the following questions:
 
-On May 5th, 2026, multiple failed SSH authentication attempts were detected on server **Uchiha**. The activity originated from IP **185.220.101.1**, later identified as a **TOR exit node** with a high abuse score.
-
-After multiple failed attempts, a **successful login to the `admin` account** was observed, confirming unauthorized access.
-
----
-
-## 🔍 Key Findings
-
-- 136 failed SSH login attempts detected  
-- Attack originated from TOR node (anonymous attacker)  
-- Targeted valid usernames (`admin`, `root`, `mysql`)  
-- Successful authentication achieved  
-- Confirmed brute force compromise  
+- Who initiated the attack?
+- Which assest was targeted?  
+- when did the activity occur?  
+- How many attempts were performed? 
+- Was the attack succesful
 
 ---
 
-## 🧪 Technical Analysis
+## 🚨 1. Detection of Failed SSH Logins
 
 ### 📡 Detection Query
+
+To identify abnormal authentication activity, the following search was performed:
 
 ```spl
 index=linux_auth host=Uchiha sourcetype=linux_secure app=ssh action=failure
@@ -47,7 +46,26 @@ index=linux_auth host=Uchiha sourcetype=linux_secure app=ssh action=failure
 
 ---
 
-### 👤 Username Enumeration
+## 🌍 2. Threat Intelligence Enrichment
+
+The suspicious IP was validated using threat intelligence (AbuseIPDB).
+
+### 📸 Evidence
+
+![AbuseIPDB](./Screenshots/Investigation02.png)
+
+### 🧾🧠 Analysis
+
+The use of a TOR exit node suggests:
+
+- Attempt to anonymize attacker origin
+- Common technique in automated attacks and brute force campaigns
+
+---
+
+## 3. 👤 Targeted Usernames Analysis
+
+To identify which accounts were targeted:
 
 ```spl
 index=linux_auth host=Uchiha sourcetype=linux_secure app=ssh action=failure src=185.220.101.1
@@ -62,21 +80,29 @@ index=linux_auth host=Uchiha sourcetype=linux_secure app=ssh action=failure src=
 
 ### 🧾 Result
 
-Targeted users:
+The attacker attemped authentication against the following accounts:
 
 - admin  
 - root  
-- mysql  
-- invalid users  
+- multiple invalid users
 
+### 🧠 Analysis
+
+- Presence of valid usernames (e.g., admin, root) indicates targeted brute force
+- Invalid usernames suggest username enumeration behavior
 ---
 
-### ⏱ Timeline Analysis
+## ⏱ 4. Attack Timeline Analysis
+
+To understand attack behavior over time:
 
 ```spl
 index=linux_auth host=Uchiha sourcetype=linux_secure src=185.220.101.1
-| eval "Date and Time" = strftime(_time,"%Y-%m-%d %H:%M:%S")
-| table "Date and Time" action user src
+| eval src_ip=src
+| eval username=user
+| eval result=action
+| eval "Date and Time" = strftime(_time, "%Y-%m-%d %H:%M:%S")
+| table "Date and Time" result username src_ip
 | sort "Date and Time"
 ```
 
@@ -84,14 +110,16 @@ index=linux_auth host=Uchiha sourcetype=linux_secure src=185.220.101.1
 
 ![Timeline](./Screenshots/Investigation04.png)
 
-### 🧾 Findings
+### 🧠 Analysis
 
 - High-frequency attempts within seconds  
-- Automated attack behavior (likely brute force tool)  
+- This indicates automated attack behavior (likely brute force tool)  
 
 ---
 
-### 🔐 Successful Login Detection
+## 🔐 5. Detection of Successful Authentication
+
+To verify if the attack succeeded:
 
 ```spl
 index=linux_auth host=Uchiha sourcetype=linux_secure "Accepted password" src=185.220.101.1
@@ -102,27 +130,14 @@ index=linux_auth host=Uchiha sourcetype=linux_secure "Accepted password" src=185
 
 ![Successful Login](./Screenshots/Investigation05.png)
 
-### 🧾 Result
+### ✅ Findings
 
 - Successful login detected  
 - **Compromised account:** `admin`  
 
 ---
 
-## 🌍 Indicators of Compromise (IoCs)
-
-- **IP Address:** 185.220.101.1  
-- **Type:** TOR Exit Node  
-- **Abuse Score:** 100%  
-- **Behavior:** SSH brute force + successful authentication  
-
-### 📸 Threat Intelligence Evidence
-
-![AbuseIPDB](./Screenshots/Investigation02.png)
-
----
-
-## 🧠 Root Cause Analysis
+## 6. ⚠️ Root Cause Analysis
 
 - There was a weak or guessable password for `admin`  
 - SSH was exposed to external network
@@ -141,16 +156,30 @@ index=linux_auth host=Uchiha sourcetype=linux_secure "Accepted password" src=185
 
 ---
 
-## ⚠️ Impact Analysis
+## 🚨 Security Impact
 
-- There has been a compromise of valid credentials  
-- There has unauthorized SSH access  
+- Compromise of valid user credentials
+- Unauthorized SSH access to critical system
+- Potential risk of:
+  - Privilege escalation
+  - Persistence
+  - Lateral movement
+  - Data exfiltration 
 
-### Potential Impact:
+---
 
-- Privilege escalation  
-- Persistence  
-- Lateral movement  
+## 🧬 MITRE ATT&CK Mapping
+
+The observed activity aligns with the following MITRE ATT&CK techniques:
+
+- **T1110 – Brute Force**  
+  The attacker performed multiple authentication attempts against the SSH service.
+
+- **T1110.001 – Password Guessing**  
+  Common usernames such as `admin` and `root` were targeted using likely dictionary-based attempts.
+
+- **T1078 – Valid Accounts**  
+  The attacker successfully authenticated using valid credentials, gaining unauthorized access.
 
 ---
 
