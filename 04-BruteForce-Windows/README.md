@@ -38,7 +38,7 @@ index=linux_auth host=Uchiha sourcetype=linux_secure app=ssh action=failure
 
 ### 📸 Evidence
 
-![Brute Force Attempts](./Screenshots/investigation01.png)
+![Brute Force Attempts](./Screenshots/Investigation01.png)
 
 ### 🧾 Result
 
@@ -58,7 +58,7 @@ index=linux_auth host=Uchiha sourcetype=linux_secure app=ssh action=failure src=
 
 ### 📸 Evidence
 
-![Username Enumeration](./Screenshots/investigation03.png)
+![Username Enumeration](./Screenshots/Investigation03.png)
 
 ### 🧾 Result
 
@@ -82,7 +82,7 @@ index=linux_auth host=Uchiha sourcetype=linux_secure src=185.220.101.1
 
 ### 📸 Evidence
 
-![Timeline](./Screenshots/investigation04.png)
+![Timeline](./Screenshots/Investigation04.png)
 
 ### 🧾 Findings
 
@@ -100,7 +100,7 @@ index=linux_auth host=Uchiha sourcetype=linux_secure "Accepted password" src=185
 
 ### 📸 Evidence
 
-![Successful Login](./Screnshots/investigation05.png)
+![Successful Login](./Screnshots/Investigation05.png)
 
 ### 🧾 Result
 
@@ -118,7 +118,7 @@ index=linux_auth host=Uchiha sourcetype=linux_secure "Accepted password" src=185
 
 ### 📸 Threat Intelligence Evidence
 
-![AbuseIPDB](./Screenshots/investigation02.png)
+![AbuseIPDB](./Screenshots/Investigation02.png)
 
 ---
 
