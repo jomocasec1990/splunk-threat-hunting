@@ -1,55 +1,127 @@
-# 🛡️ SOC Threat Hunting with Splunk – Labs & Detection Techniques
+# 🛡️ SOC Threat Hunting Lab with Splunk  
+### Threat Hunting • Detection Engineering • SOC Monitoring
 
-This repository documents my hands-on threat hunting labs using **Splunk Enterprise** 
+This repository documents my personal SOC and Threat Hunting laboratory built around **Splunk Enterprise** for developing and testing detection logic, monitoring workflows, and security investigations in a realistic enterprise-like environment.
 
-The labs simulate real-world attack scenarios and use Splunk to detect and analyze adversary techniques aligned with **MITRE ATT&CK**.
+The purpose of this lab is to strengthen practical skills related to:
 
----
+- Threat Hunting
+- Detection Engineering
+- Log Analysis
+- Security Monitoring
+- SOC Investigations
+- MITRE ATT&CK mapping
+- Endpoint & Network Telemetry Analysis
+- SIEM Dashboard Development
 
-## 🔍 Topics Covered
-
-- ✅ Splunk Installation & App Setup (BOTS, Sysmon, etc.)
-- ✅ Hunting with SPL: `top`, `rare`, regex, eval, etc.
-- ✅ IOC Detection: DNS, SMB, Web Uploads
-- ✅ Process Injection, Mimikatz, LSASS, Svchost LOLBAS
-- ✅ Lateral Movement: PsExec, WinRM, WMI
-- ✅ Credential Attacks: Pass-the-Hash, Pass-the-Ticket, Kerberoasting, DCSync
-- ✅ Anomaly Detection with MLTK (Gaussian, Standard Deviation)
-- ✅ CTI Enrichment: MISP, AlienVault, VirusTotal, ChatGPT Integration
-- ✅ Beaconing & DNS Tunneling with RITA + Zeek
-- ✅ Automation & Integration Labs
+Rather than focusing on offensive security or exploitation, this lab is centered on the **defensive side of cybersecurity**, simulating how a SOC analyst or detection engineer investigates suspicious behavior using real telemetry sources.
 
 ---
 
-## ⚒️ Lab Environment
+# 🔥 What This Lab Includes
 
-| Component         | Tool / Platform                                 |
-|------------------|--------------------------------------------------|
-| **SIEM**         | Splunk Enterprise (Developer License)            |
-| **Endpoints**    | Windows 10 (Sysmon, Atomic Red Team)             |
-| **Servers**      | Ubuntu (Web, Honeypot), Windows Server (AD)      |
-| **Firewall**     | Palo Alto NGFW (syslog to Splunk)                |
-| **Threat Feeds** | MISP, AlienVault OTX, VirusTotal API             |
-| **ML/Analytics** | Splunk MLTK, RITA + Zeek + MongoDB               |
-| **Enrichment**   | ChatGPT, DNS tools, CTI modules                  |
+This environment integrates multiple security technologies and log sources to create centralized visibility across endpoints, servers, network traffic, and authentication activity.
 
----
+The lab includes:
 
-## 🔐 Network Topology – Zones & IP Schema
+- Splunk dashboards
+- Detection logic using SPL
+- Threat hunting scenarios
+- Authentication monitoring
+- Network traffic analysis
+- Suricata IDS telemetry
+- Sysmon endpoint visibility
+- Windows & Linux log analysis
+- IOC enrichment workflows
+- MITRE ATT&CK aligned detections
+- Security investigations and analysis
 
-| Zone             | Subnet            | VM(s)                                             | Notes                              |
-|------------------|-------------------|---------------------------------------------------|-------------------------------------|
-| Inside Network   | 10.1.1.0/24       | Windows10: 10.1.1.10                              | User/attacker endpoint              |
-| DMZ Network      | 10.1.2.0/24       | AD-Konoha: 10.1.2.10, WebServer: 10.1.2.11, Honeypot: 10.1.2.12, Kali: 10.1.2.100 | Public-facing, exposed services     |
-| Management Net   | 10.1.3.0/24       | Splunk Server: 10.1.3.12, Wazuh: 10.1.3.11, Docker-Server: 10.1.3.10 | Security tools & backend            |
-| Outside Network  | 192.168.0.0/24    | Kali (ext): 192.168.0.100                         | Internet simulation (optional)      |
+All dashboards, detections, and searches are developed and tested inside my own SOC lab environment.
 
 ---
 
+# 🧪 SOC Lab Environment
 
-## 🧐 About Me
+| Component | Tool / Platform |
+|---|---|
+| **SIEM** | Splunk Enterprise (Developer License) |
+| **Endpoints** | Windows 10 + Sysmon |
+| **Servers** | Ubuntu Web Server, Honeypot, Windows Server AD |
+| **Firewall** | Palo Alto NGFW (Syslog → Splunk) |
+| **IDS** | Suricata |
+| **Threat Intelligence** | MISP, AlienVault OTX, VirusTotal |
+| **Analytics** | Splunk MLTK, Zeek, RITA |
+| **Enrichment** | DNS tools, CTI modules |
 
-I’m a Network Security Engineer with 8+ years of experience. This project reflects my applied learning and readiness for real-world detection and incident response roles using Splunk and CTI tools.
+---
+
+# 🌐 Network Topology
+
+## 🔹 Inside Network — 10.1.1.0/24
+
+| Host | Role |
+|---|---|
+| Windows10 – 10.1.1.10 | Endpoint telemetry |
+
+---
+
+## 🔹 DMZ Network — 10.1.2.0/24
+
+| Host | Role |
+|---|---|
+| AD-Konoha – 10.1.2.10 | Active Directory |
+| WebServer – 10.1.2.11 | Apache Web Services |
+| Kali Linux – 10.1.2.100 | Internal testing system |
+
+---
+
+## 🔹 Security Operations Network — 10.1.3.0/24
+
+| Host | Role |
+|---|---|
+| Splunk – 10.1.3.12 | SIEM & dashboards |
+
+
+---
+
+# 🎯 Main Focus Areas
+
+- Threat Hunting with Splunk
+- Detection Engineering
+- SOC Dashboards
+- Authentication Monitoring
+- Port Scan Detection
+- Reconnaissance Detection
+- PowerShell Monitoring
+- IDS Log Analysis
+- MITRE ATT&CK Mapping
+- IOC Enrichment
+- Endpoint Telemetry Analysis
+
+---
+
+# 🧠 About This Project
+
+This repository reflects my hands-on learning process in defensive cybersecurity and SOC operations.
+
+Every dashboard, search, and detection included here is designed to improve practical visibility into attacker behavior, suspicious activity, and security monitoring workflows using centralized telemetry and SIEM analysis.
+
+The lab continues evolving as I build new detections, dashboards, and hunting methodologies.
+
+---
+
+# 👨‍💻 About Me
+
+I’m a Network Security Engineer with 8+ years of experience focused on:
+
+- Network Security
+- Threat Detection
+- SIEM Monitoring
+- Palo Alto Technologies
+- SOC Operations
+- Detection Engineering
+
+This project represents my practical work and continuous learning in threat hunting and security monitoring.
 
 🔗 [LinkedIn](https://www.linkedin.com/in/jordan-moran-ab5994108/)  
 🔗 [GitHub](https://github.com/jomocasec1990)
